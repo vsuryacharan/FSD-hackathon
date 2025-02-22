@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: #ff8c00;
+            color: white;
+            border-radius: 10px;
+        }
+        .chat-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .chat-box p {
+            animation: fadeIn 0.5s ease-in-out;
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 70%;
+        }
+        .user-message {
+            background: #ffebcc;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background: #e0e0e0;
+            align-self: flex-start;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .chat-input:focus {
+            border-color: #ff8c00;
+            outline: none;
+        }
+        .send-btn {
+            padding: 10px;
+            background: #ff8c00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .send-btn:hover {
+            background: #e07b00;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Bot">
+            <h2>Shopping Assistant 🛍️</h2>
+        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-input-container">
+            <input type="text" id="user-input" class="chat-input" placeholder="Ask about a product...">
+            <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            let userInput = document.getElementById("user-input").value;
+            let chatBox = document.getElementById("chat-box");
+
+            if (userInput.trim() === "") return;
+
+            // Append user message with animation
+            let userMessage = document.createElement("p");
+            userMessage.classList.add("user-message");
+            userMessage.innerHTML = `<strong>You:</strong> ${userInput}`;
+            chatBox.appendChild(userMessage);
+            document.getElementById("user-input").value = "";
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Fetch bot response
+            fetch(`/chatbot-response?message=${encodeURIComponent(userInput)}`)
+                .then(response => response.json())
+                .then(data => {
+                    let botMessage = document.createElement("p");
+                    botMessage.classList.add("bot-message");
+                    botMessage.innerHTML = `<strong>Bot:</strong> ${data.response}`;
+                    chatBox.appendChild(botMessage);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+
+</body>
+</html>
